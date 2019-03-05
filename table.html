@@ -1,5 +1,6 @@
 <html>
     <script src="./lib/vue-2.4.0.js"></script>
+    <script src="./lib/vue-resource-1.3.4.js"></script>
     <link rel="stylesheet" href="lib/bootstrap-3.3.7.css">
     <body>
         <div id="app">
@@ -12,18 +13,21 @@
                             <input type="text" v-model="id">
                         </label>
                         <label>name:
-                                <input type="text" v-model="name">
+                                <input type="text" v-model="name" @keyup.enter="add">
                         </label>
                    
                         <input type="button" value="添加" class="btn btn-primary" @click="add()"> 
 
                         <label>搜索名称关键字:
-                                <input type="text" v-model="keywords" v-model="keywords">
+                                <input type="text" v-model="keywords" v-model="keywords" v-focus v-color="'blue'">
                         </label>
                  </div>
                 
                      
             </div>
+
+           
+            
             
 
             <table class="table table-bordered table-hover table-striped">
@@ -66,7 +70,24 @@
                     
               })
               
-              
+              Vue.directive('focus',{
+                  bind:function(el){},
+                  inserted:function(el){
+                      //inserted表示元素插入DOM中的时候，会执行inserted函数[触发一次]
+                      el.focus()
+                  },
+                  updated:function(el){
+                      //当VNode更新的时候
+                  }
+              })
+
+              Vue.directive('color',{
+                  bind:function(el,binding){
+                        el.style.color = binding.value
+                  }
+              })
+
+
               var vm = new Vue({
                   el:'#app',
                   data:{
@@ -77,6 +98,9 @@
                          {id:1, name:'benz',ctime:new Date()},
                          {id:2, name:'bwm',ctime:new Date()},
                      ]
+                  },
+                  created(){
+                      this.getListInfo()
                   },
                   methods:{
                       add(){
@@ -102,6 +126,15 @@
                                      return item;
                                 }
                             })
+                      },
+                      getListInfo(){
+                         this.$http.get('http://192.168.0.154:8080/client/getprodlist').then(result=>{
+                             console.log(result.body)
+                             var result = result.body
+                             if(result.errorCode ==='0'){
+                                this.list.push(result.data)
+                             }
+                         })
                       }
                   }
               });
