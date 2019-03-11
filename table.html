@@ -21,6 +21,14 @@
                         <label>搜索名称关键字:
                                 <input type="text" v-model="keywords" v-model="keywords" v-focus v-color="'blue'">
                         </label>
+
+
+
+                        <label>name:
+                            <input type="text" v-model="name" @keyup.enter="addProduct">
+                    </label>
+               
+                    <input type="button" value="添加到服务端" class="btn btn-primary" @click="addProduct()"> 
                  </div>
                 
                      
@@ -128,13 +136,24 @@
                             })
                       },
                       getListInfo(){
-                         this.$http.get('http://192.168.0.154:8080/client/getprodlist').then(result=>{
+                         this.$http.get('http://192.168.0.154:8080/client/getCars').then(result=>{
                              console.log(result.body)
                              var result = result.body
                              if(result.errorCode ==='0'){
-                                this.list.push(result.data)
+                                this.list= result.data
                              }
                          })
+                      },
+                      addProduct(){
+                          this.$http.post('http://192.168.0.154:8080/client/addCar',{name: this.name},{emulateJSON: true}).then(result=>{
+                                
+                                if(result.body.errorCode ==='0'){
+                                    this.getListInfo()
+                                    this.name = ''
+                                }else{
+                                    console.log("add fail")
+                                }
+                          })
                       }
                   }
               });
